@@ -18,5 +18,5 @@ class CdrViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CdrSerializer
     filter_backends = (filters.DjangoFilterBackend, SearchFilter, OrderingFilter)
     search_fields = ('clid', 'src', 'dst', 'disposition')
-    filterset_class = CdrFilters
+   # filterset_class = CdrFilters
     ordering_fields = ('calldate')
