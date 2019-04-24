@@ -82,13 +82,14 @@ WSGI_APPLICATION = 'cdr_api.wsgi.application'
 
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.mysql',
         # 'USER': 'duany',
-        # 'PASSWORD': 'macuran',
-        # 'HOST': 'voip.xnet4u.com',
-        # 'NAME': 'asteriskcdrdb',
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+	'USER':'root',
+        #'PASSWORD': 'macuran',
+        'HOST': 'voip.xnet4u.com',
+        'NAME': 'asteriskcdrdb',
+        #'ENGINE': 'django.db.backends.sqlite3',
+        #'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 
     }
 }
