@@ -43,9 +43,9 @@ def export_to_xls(modeladmin, request, queryset):
 export_to_xls.short_description = "Exportar a XLS"
 
 class CdrAdmin(admin.ModelAdmin):
-    list_display = ('clid','src' ,'dst','uniqueid', 'calldate', 'duration', 'tiempo_facturado', 'disposition')
-    list_filter = ('disposition',)
-    search_fields = ('uniqueid',)
+    list_display = ['clid','src', 'cnum', 'cnam','dst', 'outbound_cnum', 'outbound_cnam','dst_cnam','calldate', 'duration', 'tiempo_facturado', 'disposition']
+    list_filter = ['disposition','calldate', 'cnum', 'cnam','dst', 'outbound_cnum', 'outbound_cnam','dst_cnam',]
+    search_fields = ['cnum','cnam', 'dst', 'outbound_cnum', 'outbound_cnam','dst_cnam']
     date_hierarchy = 'calldate'
     actions = [export_to_xls]
 
