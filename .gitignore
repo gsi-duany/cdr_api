@@ -1,0 +1,4 @@
+venv/*
+codealike.json
+db.sqlite3
+.idea/*
