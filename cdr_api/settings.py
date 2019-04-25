@@ -84,7 +84,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         # 'USER': 'duany',
-	'USER':'root',
+        'USER':'root',
         #'PASSWORD': 'macuran',
         'HOST': 'voip.xnet4u.com',
         'NAME': 'asteriskcdrdb',
@@ -153,3 +153,5 @@ REST_FRAMEWORK = {
     #     'rest_framework.authentication.SessionAuthentication',
     # )
 }
+
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
