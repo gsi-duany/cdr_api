@@ -1,0 +1,26 @@
+#!/bin/bash
+
+NAME="cdr_api"
+DJANGODIR=/var/www/html/source/cdr_api
+USER=root
+GROUP=root
+WORKERS=3
+BIND=unix:/var/www/html/source/cdr_api/cdr_api.sock
+DJANGO_SETTINGS_MODULE=cdr_api.settings
+DJANGO_WSGI_MODULE=cdr_api.wsgi
+LOGLEVEL=error
+
+cd $DJANGODIR
+source /root/.virtualenvs/python3/bin/activate
+
+export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
+export PYTHONPATH=$DJANGODIR:$PYTHONPATH
+
+exec /root/.virtualenvs/python3/bin/gunicorn ${DJANGO_WSGI_MODULE}:application \
+  --name $NAME \
+  --workers $WORKERS \
+  --user=$USER \
+  --group=$GROUP \
+  --bind=$BIND \
+  --log-level=$LOGLEVEL \
+  --log-file=-
