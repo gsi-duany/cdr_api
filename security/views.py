@@ -1,8 +1,13 @@
 from django.contrib.auth import authenticate
 from django.views.decorators.csrf import csrf_exempt
+
+from rest_framework import viewsets, mixins
+from django_filters import rest_framework as filters
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import generics
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.permissions import AllowAny
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
@@ -10,11 +15,21 @@ from rest_framework.status import (
     HTTP_200_OK
 )
 from rest_framework.response import Response
-from .serializers import UserSerializer
+from .serializers import UserSerializer, User
 from rest_framework.views import APIView
 
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    filter_backends = (filters.DjangoFilterBackend, SearchFilter, OrderingFilter)
+    permission_classes = [IsAdminUser]
+
+    def get_queryset(self):
+        return self.queryset
+
+
 class LoginAPI(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = ()
 
     """
        Login method with "username" and "password"

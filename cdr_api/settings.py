@@ -96,6 +96,21 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         # 'USER': 'duany',
+#         'USER':'root',
+#         #'PASSWORD': 'macuran',
+#         'HOST': 'voip.xnet4u.com',
+#         'NAME': 'asteriskcdrdb',
+#         #'ENGINE': 'django.db.backends.sqlite3',
+#         #'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#
+#     }
+# }
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators

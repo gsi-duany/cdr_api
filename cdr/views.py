@@ -44,10 +44,26 @@ class CDRInfoExtenViewSet(APIView):
 
     def get(self, request):
         """
-        Get exten's stadistics
-        :param request:
-        :return: Data
-        """
+               GET statistics information
+
+               Parameters:
+                  - name: exten
+                    description: Exten Number that you what obtain information
+                    required: true
+                    type: string
+                  - name: start_date
+                    description: Initial date
+                    required: true
+                    type: datetime
+                  - name: end_date
+                    description: Final date
+                    required: true
+                    type: datetime
+                return {'totalCalls': totalCalls, 'totalTimeCalls': totalTimeCalls,
+                     'totalReceivedCalls': totalReceivedCalls,'totalTimeReceivedCalls': totalTimeReceivedCalls,
+                     'totalEmitedCalls': totalEmitedCalls,'timeTotalEmitedCalls': totalTimeEmitedCalls,
+                     'total30sCalls': total30sCalls,'totalDuration30sCalls': totalDuration30sCalls, "lostCalls": lostCalls}
+            """
         exten = request.query_params.get("exten")
         start_date = datetime.datetime.strptime(request.query_params.get("start_date"), '%Y-%m-%d %H:%M:%S')
         end_date = datetime.datetime.strptime(request.query_params.get("end_date"), '%Y-%m-%d %H:%M:%S')
@@ -88,7 +104,7 @@ class CDRInfoExtenViewSet(APIView):
 
         valueDict = {'totalCalls': totalCalls, 'totalTimeCalls': totalTimeCalls,
                      'totalReceivedCalls': totalReceivedCalls,'totalTimeReceivedCalls': totalTimeReceivedCalls,
-                     'totalEmitedCalls': totalEmitedCalls,'timeTotalEmitedCalls': totalTimeEmitedCalls,
+                     'totalEmitedCalls': totalEmitedCalls,'totalTimeEmitedCalls': totalTimeEmitedCalls,
                      'total30sCalls': total30sCalls,'totalDuration30sCalls': totalDuration30sCalls, "lostCalls": lostCalls}
 
         return Response(valueDict,

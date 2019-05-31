@@ -17,14 +17,15 @@ from django.contrib import admin
 from django.urls import path
 from rest_framework import routers
 from cdr.views import CdrViewSet, CDRInfoExtenViewSet
-from security.views import LoginAPI, login
-
-from rest_framework_swagger.views import get_swagger_view
-
-schema_view = get_swagger_view(title='Pastebin API')
+from security.views import LoginAPI, login, UserViewSet
 
 router = routers.DefaultRouter()
 router.register(r'api/cdrs', CdrViewSet)
+router.register(r'api/users', UserViewSet)
+
+from rest_framework_swagger.views import get_swagger_view
+
+schema_view = get_swagger_view(title='CDR API')
 
 
 urlpatterns = [
