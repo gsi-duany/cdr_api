@@ -110,6 +110,5 @@ db.sqlite3
 .idea/*
 *.pyc
 
-
 #Static Files
 static/*
