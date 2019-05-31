@@ -40,7 +40,7 @@ class CdrViewSet(viewsets.ReadOnlyModelViewSet):
 
 class CDRInfoExtenViewSet(APIView):
 
-    permission_classes= [AllowAny]
+    permission_classes= [IsAuthenticated]
 
     def get(self, request):
         """
