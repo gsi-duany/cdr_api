@@ -16,8 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from rest_framework import routers
-from cdr.views import CdrViewSet
-from security.views import login
+from cdr.views import CdrViewSet, CDRInfoExtenViewSet
+from security.views import LoginAPI, login
 
 from rest_framework_swagger.views import get_swagger_view
 
@@ -29,7 +29,8 @@ router.register(r'api/cdrs', CdrViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/login', login),
+    path('accounts/login/',login),
+    path('api/statistics/exten/', CDRInfoExtenViewSet.as_view()),
     path('api/docs/', schema_view)
 ]
 

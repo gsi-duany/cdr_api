@@ -83,10 +83,12 @@ WSGI_APPLICATION = 'cdr_api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        # 'USER': 'duany',
-        'USER':'root',
-        #'PASSWORD': 'macuran',
-        'HOST': 'voip.xnet4u.com',
+        'USER': 'duany',
+        #'USER':'root',
+        'PASSWORD': 'macuran',
+        # 'HOST': 'voip.xnet4u.com',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
         'NAME': 'asteriskcdrdb',
         #'ENGINE': 'django.db.backends.sqlite3',
         #'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
@@ -155,3 +157,11 @@ REST_FRAMEWORK = {
 }
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+
+# SWAGGER_SETTINGS= {
+#     'info': {
+#     'contact': 'macurandb@gmail.com',
+#     'description': 'Cdr API docs ',
+#     'title': 'API Docs',
+#     },
+# }

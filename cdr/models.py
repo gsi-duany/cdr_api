@@ -43,6 +43,7 @@ class Cdr(models.Model):
     class Meta:
         managed = False
         db_table = 'cdr'
+        ordering = ('calldate',)
 
     def __unicode__(self):
         return 'callid: %s "%s" (%i)' % (self.uniqueid, self.disposition, self.duration)
