@@ -13,7 +13,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.views import APIView
 from django_filters import DateFilter, DateRangeFilter
 from django.db.models import Sum, Count, Avg, Q
-from django.db.models.functions import Length
+from django.db.models.functions import Length, Coalesce
 from .models import Cdr
 from datetime import datetime
 from rest_framework.status import (
@@ -41,6 +41,62 @@ class CdrViewSet(viewsets.ReadOnlyModelViewSet):
 class CDRInfoExtenViewSet(APIView):
 
     permission_classes= [IsAuthenticated]
+    
+    def statistics_extension(self, exten, start_date, end_date):
+
+        totalReceivedCalls = Cdr.objects.filter(dst=exten, calldate__range=[start_date, end_date]).count()
+
+        totalTimeReceivedCalls = Cdr.objects.filter(Q(dst=exten, calldate__range=[start_date, end_date])).aggregate(duration__sum =
+        Coalesce(Sum('duration'),0))['duration__sum']
+
+        totalEmitedCalls = Cdr.objects.filter(src=exten, calldate__range=[start_date, end_date]).count()
+
+        totalTimeEmitedCalls = Cdr.objects.filter(Q(src=exten, calldate__range=[start_date, end_date])).aggregate(
+            duration__sum=
+            Coalesce(Sum('duration'), 0)
+        )['duration__sum']
+
+        totalCalls = totalReceivedCalls + totalEmitedCalls
+        totalTimeCalls = totalTimeReceivedCalls + totalTimeEmitedCalls
+
+        total30sSrcCalls = Cdr.objects.annotate(
+            src_len=Length('src')
+        ).filter(src_len__gt=4, calldate__range=[start_date, end_date], duration__gt=30).count()
+
+        total30sDstCalls = Cdr.objects.annotate(
+            dst_len=Length('src')
+        ).filter(dst_len__gt=4, calldate__range=[start_date, end_date], duration__gt=30).count()
+
+        total30sCalls = total30sSrcCalls + total30sDstCalls
+
+        totalDuration30sSrcCalls = Cdr.objects.annotate(
+            src_len=Length('src')
+        ).filter(dst=exten, src_len__gt=4, calldate__range=[start_date, end_date], duration__gt=30).aggregate(
+            duration__sum=
+            Coalesce(Sum('duration'), 0)
+        )['duration__sum']
+
+        totalDuration30sDstCalls = Cdr.objects.annotate(
+            dst_len=Length('dst')
+        ).filter(src=exten, dst_len__gt=4, calldate__range=[start_date, end_date], duration__gt=30).aggregate(
+            duration__sum=
+            Coalesce(Sum('duration'), 0)
+        )['duration__sum']
+
+
+        totalDuration30sCalls = totalDuration30sSrcCalls + totalDuration30sDstCalls
+
+        lostCalls = Cdr.objects.filter(disposition="NO ANSWER", dst=exten,
+                                       calldate__range=[start_date, end_date]).count()
+
+        valueDict = {'totalCalls': totalCalls, 'totalTimeCalls': totalTimeCalls,
+                     'totalReceivedCalls': totalReceivedCalls, 'totalTimeReceivedCalls': totalTimeReceivedCalls,
+                     'totalEmitedCalls': totalEmitedCalls, 'totalTimeEmitedCalls': totalTimeEmitedCalls,
+                     'total30sCalls': total30sCalls, 'totalDuration30sCalls': totalDuration30sCalls,
+                     "lostCalls": lostCalls}
+        return valueDict
+
+
 
     def get(self, request):
         """
@@ -64,49 +120,18 @@ class CDRInfoExtenViewSet(APIView):
                      'totalEmitedCalls': totalEmitedCalls,'timeTotalEmitedCalls': totalTimeEmitedCalls,
                      'total30sCalls': total30sCalls,'totalDuration30sCalls': totalDuration30sCalls, "lostCalls": lostCalls}
             """
-        exten = request.query_params.get("exten")
-        start_date = datetime.datetime.strptime(request.query_params.get("start_date"), '%Y-%m-%d %H:%M:%S')
-        end_date = datetime.datetime.strptime(request.query_params.get("end_date"), '%Y-%m-%d %H:%M:%S')
+        extens = request.query_params.get("extens",[]).split(",")
+        start_date = datetime.datetime.strptime(request.query_params.get("start_date", datetime.datetime.now()), '%Y-%m-%d %H:%M:%S')
+        end_date = datetime.datetime.strptime(request.query_params.get("end_date", datetime.datetime.now()), '%Y-%m-%d %H:%M:%S')
 
-        totalReceivedCalls = Cdr.objects.filter(dst=exten, calldate__range=[start_date, end_date]).count()
-
-        totalTimeReceivedCalls = Cdr.objects.filter(Q(dst=exten, calldate__range=[start_date, end_date])).aggregate(
-            Sum('duration'))['duration__sum']
-
-        totalEmitedCalls = Cdr.objects.filter(src=exten, calldate__range=[start_date, end_date]).count()
-        totalTimeEmitedCalls = Cdr.objects.filter(Q(src=exten, calldate__range=[start_date, end_date])).aggregate(
-            Sum('duration'))['duration__sum']
-
-        totalCalls = totalReceivedCalls + totalEmitedCalls
-        totalTimeCalls = totalTimeReceivedCalls + totalTimeEmitedCalls
-
-        total30sSrcCalls = Cdr.objects.annotate(
-            src_len=Length('src') 
-        ).filter(src_len__gt=4, calldate__range=[start_date, end_date], duration__gt=30).count()
-
-        total30sDstCalls = Cdr.objects.annotate(
-            dst_len=Length('src')
-        ).filter(dst_len__gt=4, calldate__range=[start_date, end_date], duration__gt=30).count()
-
-        total30sCalls = total30sSrcCalls + total30sDstCalls
-
-        totalDuration30sSrcCalls = Cdr.objects.annotate(
-            src_len=Length('src')
-        ).filter(dst = exten, src_len__gt=4, calldate__range=[start_date, end_date], duration__gt=30).aggregate(Sum('duration'))['duration__sum']
-
-        totalDuration30sDstCalls = Cdr.objects.annotate(
-            dst_len=Length('dst')
-        ).filter(src = exten,dst_len__gt=4, calldate__range=[start_date, end_date], duration__gt=30).aggregate(Sum('duration'))['duration__sum']
-
-        totalDuration30sCalls = totalDuration30sSrcCalls + totalDuration30sDstCalls
-
-        lostCalls =  Cdr.objects.filter(disposition="NO ANSWER", dst = exten, calldate__range=[start_date, end_date]).count()
-
-        valueDict = {'totalCalls': totalCalls, 'totalTimeCalls': totalTimeCalls,
-                     'totalReceivedCalls': totalReceivedCalls,'totalTimeReceivedCalls': totalTimeReceivedCalls,
-                     'totalEmitedCalls': totalEmitedCalls,'totalTimeEmitedCalls': totalTimeEmitedCalls,
-                     'total30sCalls': total30sCalls,'totalDuration30sCalls': totalDuration30sCalls, "lostCalls": lostCalls}
-
-        return Response(valueDict,
+        results = {}
+        if type(extens) == list:
+            for exten in extens:
+                values = self.statistics_extension(exten, start_date, end_date)
+                results[exten] = values
+        else:
+            values = self.statistics_extension(extens, start_date, end_date)
+            results[extens] = values
+        return Response(results,
                         status=HTTP_200_OK)
      
