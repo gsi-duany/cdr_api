@@ -102,7 +102,7 @@ class CDRInfoExtenViewSet(APIView):
         """
                GET statistics information
 
-               Parameters:
+               Args:
                   - name: exten
                     description: Exten Number that you what obtain information
                     required: true
@@ -120,18 +120,17 @@ class CDRInfoExtenViewSet(APIView):
                      'totalEmitedCalls': totalEmitedCalls,'timeTotalEmitedCalls': totalTimeEmitedCalls,
                      'total30sCalls': total30sCalls,'totalDuration30sCalls': totalDuration30sCalls, "lostCalls": lostCalls}
             """
-        extens = request.query_params.get("extens",[]).split(",")
-        start_date = datetime.datetime.strptime(request.query_params.get("start_date", datetime.datetime.now()), '%Y-%m-%d %H:%M:%S')
-        end_date = datetime.datetime.strptime(request.query_params.get("end_date", datetime.datetime.now()), '%Y-%m-%d %H:%M:%S')
+        extens = request.query_params.get("extens",None)
+        if extens !=None:
+            extens = extens.split(",")
+        start_date = datetime.datetime.strptime(request.query_params.get("start_date", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')), '%Y-%m-%d %H:%M:%S')
+        end_date = datetime.datetime.strptime(request.query_params.get("end_date", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')), '%Y-%m-%d %H:%M:%S')
 
         results = {}
         if type(extens) == list:
             for exten in extens:
-                values = self.statistics_extension(exten, start_date, end_date)
-                results[exten] = values
-        else:
-            values = self.statistics_extension(extens, start_date, end_date)
-            results[extens] = values
+                values = self.statistics_extension(exten.strip(), start_date, end_date)
+                results[exten.strip()] = values
         return Response(results,
                         status=HTTP_200_OK)
      
