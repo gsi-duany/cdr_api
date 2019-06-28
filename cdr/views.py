@@ -60,8 +60,11 @@ class CDRInfoExtenViewSet(APIView):
         totalTimeCalls = totalTimeReceivedCalls + totalTimeEmitedCalls
 
 
-        total30sCalls =Cdr.objects.filter(
+        total30sCalls =Cdr.objects.annotate(
+            dst_len=Length('dst')
+        ).filter(
             src= exten,
+            dst_len__gt=4,
             calldate__range=[start_date, end_date],
             duration__gte=30,
         ).count()
