@@ -59,32 +59,38 @@ class CDRInfoExtenViewSet(APIView):
         totalCalls = totalReceivedCalls + totalEmitedCalls
         totalTimeCalls = totalTimeReceivedCalls + totalTimeEmitedCalls
 
-        total30sSrcCalls = Cdr.objects.annotate(
-            src_len=Length('src')
-        ).filter(src_len__gt=4, calldate__range=[start_date, end_date], duration__gt=30).count()
 
-        total30sDstCalls = Cdr.objects.annotate(
-            dst_len=Length('src')
-        ).filter(dst_len__gt=4, calldate__range=[start_date, end_date], duration__gt=30).count()
+        total30sCalls =Cdr.objects.filter(
+            src= exten,
+            calldate__range=[start_date, end_date],
+            duration__gte=30,
+        ).count()
+        # total30sSrcCalls = Cdr.objects.annotate(
+        #     src_len=Length('src')
+        # ).filter(src_len__gt=4, calldate__range=[start_date, end_date], duration__gt=30).count()
+        #
+        # total30sDstCalls = Cdr.objects.annotate(
+        #     dst_len=Length('src')
+        # ).filter(dst_len__gt=4, calldate__range=[start_date, end_date], duration__gt=30).count()
 
-        total30sCalls = total30sSrcCalls + total30sDstCalls
+        # total30sCalls = total30sSrcCalls + total30sDstCalls
 
-        totalDuration30sSrcCalls = Cdr.objects.annotate(
-            src_len=Length('src')
-        ).filter(dst=exten, src_len__gt=4, calldate__range=[start_date, end_date], duration__gt=30).aggregate(
-            duration__sum=
-            Coalesce(Sum('duration'), 0)
-        )['duration__sum']
+        # totalDuration30sSrcCalls = Cdr.objects.annotate(
+        #     src_len=Length('src')
+        # ).filter(dst=exten, src_len__gt=4, calldate__range=[start_date, end_date], duration__gt=30).aggregate(
+        #     duration__sum=
+        #     Coalesce(Sum('duration'), 0)
+        # )['duration__sum']
+        #
+        # totalDuration30sDstCalls = Cdr.objects.annotate(
+        #     dst_len=Length('dst')
+        # ).filter(src=exten, dst_len__gt=4, calldate__range=[start_date, end_date], duration__gt=30).aggregate(
+        #     duration__sum=
+        #     Coalesce(Sum('duration'), 0)
+        # )['duration__sum']
 
-        totalDuration30sDstCalls = Cdr.objects.annotate(
-            dst_len=Length('dst')
-        ).filter(src=exten, dst_len__gt=4, calldate__range=[start_date, end_date], duration__gt=30).aggregate(
-            duration__sum=
-            Coalesce(Sum('duration'), 0)
-        )['duration__sum']
 
-
-        totalDuration30sCalls = totalDuration30sSrcCalls + totalDuration30sDstCalls
+        # totalDuration30sCalls = totalDuration30sSrcCalls + totalDuration30sDstCalls
 
         lostCalls = Cdr.objects.filter(disposition="NO ANSWER", dst=exten,
                                        calldate__range=[start_date, end_date]).count()
@@ -92,7 +98,7 @@ class CDRInfoExtenViewSet(APIView):
         valueDict = {'totalCalls': totalCalls, 'totalTimeCalls': totalTimeCalls,
                      'totalReceivedCalls': totalReceivedCalls, 'totalTimeReceivedCalls': totalTimeReceivedCalls,
                      'totalEmitedCalls': totalEmitedCalls, 'totalTimeEmitedCalls': totalTimeEmitedCalls,
-                     'total30sCalls': total30sCalls, 'totalDuration30sCalls': totalDuration30sCalls,
+                     'total30sCalls': total30sCalls,
                      "lostCalls": lostCalls}
         return valueDict
 
