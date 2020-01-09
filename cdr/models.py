@@ -43,6 +43,7 @@ class Cdr(models.Model):
     class Meta:
         managed = False
         db_table = 'cdr'
+        app_label = 'cdr'
         ordering = ('calldate',)
 
     def __unicode__(self):
@@ -57,5 +58,9 @@ class Rate(models.Model):
     date_of_rate = models.DateField()
     value = models.DecimalField(max_digits=5, decimal_places=4, default=0)
 
+    class Meta:
+        app_label = 'rate'
+        managed = False
     def __unicode__(self):
         return '%s' % (self.date_of_rate)
+

@@ -41,7 +41,7 @@ class CdrViewSet(viewsets.ReadOnlyModelViewSet):
 class CDRInfoExtenViewSet(APIView):
 
     permission_classes= [IsAuthenticated]
-    
+
     def statistics_extension(self, exten, start_date, end_date):
 
         totalReceivedCalls = Cdr.objects.filter(dst=exten, calldate__range=[start_date, end_date]).count()
@@ -142,4 +142,96 @@ class CDRInfoExtenViewSet(APIView):
                 results[exten.strip()] = values
         return Response(results,
                         status=HTTP_200_OK)
-     
+
+
+class CDRCallFailsViewSet(APIView):
+    permission_classes = [IsAuthenticated]
+    extens = [
+        917815680,
+        902230290,
+        902888222,
+        911591091,
+        911591092,
+        911680893,
+        917370639,
+        933900533,
+        934520131,
+        955319893,
+        961155837,
+        934522978,
+        911169777,
+        911592997,
+        911592996,
+        911591093,
+        911169778
+    ]
+    # Exten: 917815680(917815680)
+    # Exten: 917815680(917815680)
+    # Exten: 917815680(917815680)
+    # Exten: 902230290(902230290)
+    # Exten: 902230290(902230290)
+    # Exten: 902230290(902230290)
+    # Exten: 902888222(902888222)
+    # Exten: 902888222(902888222)
+    # Exten: 902888222(902888222)
+    # Exten: 911591091(911591091)
+    # Exten: 911591091(911591091)
+    # Exten: 911591091(911591091)
+    # Exten: 911591092(911591092)
+    # Exten: 911591092(911591092)
+    # Exten: 911591092(911591092)
+    # Exten: 911680893(911680893)
+    # Exten: 911680893(911680893)
+    # Exten: 911680893(911680893)
+    # Exten: 917370639(917370639)
+    # Exten: 917370639(917370639)
+    # Exten: 917370639(917370639)
+    # Exten: 933900533(933900533)
+    # Exten: 933900533(933900533)
+    # Exten: 933900533(933900533)
+    # Exten: 934520131(934520131)
+    # Exten: 934520131(934520131)
+    # Exten: 934520131(934520131)
+    # Exten: 955319893(955319893)
+    # Exten: 955319893(955319893)
+    # Exten: 955319893(955319893)
+    # Exten: 961155837(961155837)
+    # Exten: 961155837(961155837)
+    # Exten: 934522978(934522978)
+    # Exten: 911169777(911169777)
+    # Exten: 911592997(911592997)
+    # Exten: 911592996(911592996)
+    # Exten: 911591093(911591093)
+    # Exten: 911169778(911169778)
+    def get(self, request):
+        # extens = request.query_params.get("extens", None)
+        # if extens != None:
+        #     extens = extens.split(",")
+        start_date = datetime.datetime.strptime(
+            request.query_params.get("start_date", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+            '%Y-%m-%d %H:%M:%S')
+        end_date = datetime.datetime.strptime(
+            request.query_params.get("end_date", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+            '%Y-%m-%d %H:%M:%S')
+        results = {}
+        sumNOANSWER=0
+        sumFAILED=0
+        for exten in self.extens:
+            cantNOANSWER = Cdr.objects.filter(disposition="NO ANSWER", src__icontains=exten,
+                           calldate__range=[start_date, end_date]).count()
+
+            cantFAILED = Cdr.objects.filter(disposition="FAILED", src__icontains=exten,
+                                        calldate__range=[start_date, end_date]).count()
+            results[exten] = {
+                "NOANSWER":cantNOANSWER,
+                "FAILED": cantFAILED
+            }
+            sumNOANSWER= sumNOANSWER + cantNOANSWER
+            sumFAILED = sumFAILED + cantFAILED
+        results['total']= {
+            "TOTAL": sumNOANSWER + sumFAILED ,
+            "FAILED": sumFAILED,
+            "NOANSWER" : sumNOANSWER
+        }
+        return Response(results,
+                        status=HTTP_200_OK)

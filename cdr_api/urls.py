@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from rest_framework import routers
-from cdr.views import CdrViewSet, CDRInfoExtenViewSet
+from cdr.views import CdrViewSet, CDRInfoExtenViewSet, CDRCallFailsViewSet
 from security.views import LoginAPI, login, UserViewSet
 
 router = routers.DefaultRouter()
@@ -32,6 +32,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/login/',login),
     path('api/statistics/exten/', CDRInfoExtenViewSet.as_view()),
+    path('api/statistics/callfails/', CDRCallFailsViewSet.as_view()),
     path('api/docs/', schema_view)
 ]
 

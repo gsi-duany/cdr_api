@@ -47,8 +47,8 @@ class CdrAdmin(admin.ModelAdmin):
     list_filter = ['calldate', 'disposition']
     search_fields = ['cnum','cnam', 'dst', 'outbound_cnum', 'outbound_cnam','dst_cnam']
     date_hierarchy = 'calldate'
-    actions = [export_to_xls]
+    #actions = [export_to_xls]
 
 
 admin.site.register(Cdr, CdrAdmin)
-admin.site.register(Rate)
+#admin.site.register(Rate)
